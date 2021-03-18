@@ -1,25 +1,31 @@
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:thanks/Screens/Auth/CreateAccount.dart';
 import 'package:thanks/Screens/Home.dart';
 import 'package:thanks/api/NetworkRequest.dart';
 import 'package:thanks/models/User.dart';
+import 'package:thanks/models/providerUser.dart';
 import 'package:thanks/services/helperFunctions.dart';
 import 'package:thanks/widget/backgroungtextfielid.dart';
 import 'package:thanks/widget/buttonUnfill.dart';
 
 class SignIn extends StatefulWidget {
+
+
   @override
   _SignInState createState() => _SignInState();
 }
 
 class _SignInState extends State<SignIn> {
+
   String phoneNumber;
   String changePass;
   NetworkRequest networkRequest=new NetworkRequest();
   @override
   Widget build(BuildContext context) {
-
+    String tokenUser =
+        Provider.of<providerUser>(context, listen: true).tokenUser;
     return Scaffold(
       resizeToAvoidBottomInset: true,
       resizeToAvoidBottomPadding: false,
@@ -50,7 +56,7 @@ class _SignInState extends State<SignIn> {
                  ),
                  Expanded(
                    flex: 1,
-                   child:partThree() ,
+                   child:partThree(tokenUser) ,
                  ),
                ],
              ),
@@ -96,7 +102,14 @@ class _SignInState extends State<SignIn> {
   Widget partTwo(){
 return Column(
  children: [
-   backgroungtextfielid(
+   new Container(
+
+       height: MediaQuery.of(context).size.height*0.08,
+       width: MediaQuery.of(context).size.width*0.82,
+       decoration: BoxDecoration(
+          color: Color(0xfff5f6fb),borderRadius: BorderRadius.circular(8.00),
+       ),
+       child:
      Expanded(
        child: Row(
          children: [
@@ -120,6 +133,7 @@ return Column(
                keyboardType:TextInputType.number,
                onChanged:(vall)=>setState(()=>phoneNumber=vall),
                decoration: InputDecoration(
+
                //  prefixIcon:  Image.asset("Assets/Mobile.png"),
                    suffixIcon:  Image.asset("Assets/Mobile.png"),
                    border: InputBorder.none,
@@ -139,7 +153,14 @@ return Column(
      )
    ),
    SizedBox(height: 8,),
-   backgroungtextfielid(Row(
+   new Container(
+
+       height: MediaQuery.of(context).size.height*0.08,
+       width: MediaQuery.of(context).size.width*0.82,
+       decoration: BoxDecoration(
+          color: Color(0xfff5f6fb),borderRadius: BorderRadius.circular(8.00),
+       ),
+       child:Row(
      children: [
        Directionality(
          textDirection: TextDirection.rtl,
@@ -197,14 +218,14 @@ return Column(
  ],
 );
   }
-  Widget partThree(){
+  Widget partThree(String tokenUser){
     return Column(
       //crossAxisAlignment: CrossAxisAlignment.end,
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         message!=null?Text(message,style: TextStyle(color: Colors.red),):Container(),
         SizedBox(height: 2,),
-        button(phoneNumber,changePass),
+        button(phoneNumber,changePass,tokenUser),
         SizedBox(height: 8,),
         InkWell(
         onTap: ()=>Navigator.push(context, new MaterialPageRoute(builder: (context)=>  CreateAccount(false))),
@@ -217,8 +238,17 @@ return Column(
   dynamic Output;
   String message;
   User user;
-  getLoggedInState() async {
-    await networkRequest.login(phoneNumber,changePass).then((value){
+  bool userIsAminIn;
+  getAdminInState() async {
+    await HelperFunctions.getUserAdminSharedPreference().then((value){
+      setState(() {
+        userIsAminIn  = value;
+      });
+    });
+  }
+
+  getLoggedInState(String tokenUser) async {
+    await networkRequest.login("966"+"$phoneNumber",changePass,tokenUser).then((value){
       setState(() {
         Output  = value;
       });
@@ -227,20 +257,21 @@ return Column(
       setState(() {message=Output;});
     }else{
         user=Output;
+        await  getAdminInState();
         HelperFunctions.saveUserNameSharedPreference(user.name);
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_){
-            return Home(false);
+            return Home(userIsAminIn);
           }),(route)=> false
       );
      // Navigator.push(context, new MaterialPageRoute(builder: (context)=>  Home(false)));
     }
   }
- Widget button(String phone ,String pass){
+ Widget button(String phone ,String pass,String tokenUser){
    return InkWell(
      onTap: ()=>{
 
-       getLoggedInState()
+       getLoggedInState(tokenUser)
      // if (itemCount is Map) {
      //   return [];
      //   }

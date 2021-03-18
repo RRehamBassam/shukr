@@ -20,11 +20,15 @@ class CategoryWidget extends StatelessWidget {
       },
       child: Container(
        // margin: EdgeInsets.all(4),
-        width:  MediaQuery.of(context).size.width *0.337,
-        height: MediaQuery.of(context).size.height,
+        width:  MediaQuery.of(context).size.width *0.75,
+        height:45,
+margin: EdgeInsets.symmetric(vertical: 4),
         decoration: BoxDecoration(
-          color: isSelected ? Color(0xff16BA75) : Colors.transparent,
+          color: isSelected ? Color(0xff95E8B7) : Color(0xffffffff).withOpacity(0.15),
           borderRadius: BorderRadius.circular(5.8),
+          border: Border.all(
+            color: Color(0xff000000).withOpacity(0.15),
+          ),
         ),
         child: Center(
           child: Text(

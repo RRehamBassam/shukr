@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 class singleNotification extends StatefulWidget {
+  String title;
+
+  singleNotification(this.title);
+
   @override
-  _singleNotificationState createState() => _singleNotificationState();
+  _singleNotificationState createState() => _singleNotificationState(title);
 }
 
 class _singleNotificationState extends State<singleNotification> {
+  String title;
+
+  _singleNotificationState(this.title);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -18,8 +26,8 @@ class _singleNotificationState extends State<singleNotification> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              new Text(
-                "طلبك جاهز للاستلام بامكانك التوجه \nللمطعم لاستلامه",
+              new Text(title,
+               // "طلبك جاهز للاستلام بامكانك التوجه \nللمطعم لاستلامه",
                 textAlign: TextAlign.right,
                 style: TextStyle(
                   fontFamily: "Tajawal",fontWeight: FontWeight.w500,

@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:thanks/items/singleNotification.dart';
 class Notifications extends StatefulWidget {
@@ -6,6 +7,39 @@ class Notifications extends StatefulWidget {
 }
 
 class _NotificationsState extends State<Notifications> {
+
+  String title = "Title";
+  String helper = "helper";
+
+  FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  @override
+  void initState() {
+    _firebaseMessaging.configure(
+      onLaunch: (Map<String, dynamic> message) async {
+        print("onLaunch: $message");
+      },
+
+      onMessage: (message) async{
+        print("onLaunch: $message");
+        setState(() {
+          title = message["notification"]["title"];
+          helper = "You have recieved a new notification";
+        });
+
+      },
+      onResume: (message) async{
+        print("onLaunch: $message");
+        setState(() {
+          title = message["data"]["title"];
+          helper = "You have open the application from notification";
+        });
+
+      },
+
+    );
+    // TODO: implement initState
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,8 +89,8 @@ class _NotificationsState extends State<Notifications> {
               child: ListView(
                 shrinkWrap: true,
                 children: [
-                  singleNotification(),
-                  singleNotification(),
+                // singleNotification(title),
+                 // singleNotification(),
                 ],
               ),
             )

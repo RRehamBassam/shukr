@@ -6,18 +6,23 @@ class Category {
 
 final trainCategory = Category(
   categoryId: 0,
-  name: 'لا',
+  name: 'جاهز للتسليم',
 );
 
 final busCategory = Category(
   categoryId: 1,
-  name: 'نعم',
+  name: 'تم التسليم',
 );
 
+
+final busCategor = Category(
+  categoryId: 2,
+  name: 'رفض الطلب',
+);
 
 
 final categories = [
   trainCategory,
   busCategory,
-
+  busCategor,
 ];

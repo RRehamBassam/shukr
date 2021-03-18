@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "356157650578",
+    "project_id": "shukr-e3766",
+    "storage_bucket": "shukr-e3766.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:356157650578:android:2ed748bb7d43504483184b",
+        "android_client_info": {
+          "package_name": "com.example.thanks"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "356157650578-vh3qr3fe8ppga76t30geuem4r71ki0qn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD62vw4I5FUxMwkj7TpNNW5NqVN_Ahv4ck"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "356157650578-vh3qr3fe8ppga76t30geuem4r71ki0qn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

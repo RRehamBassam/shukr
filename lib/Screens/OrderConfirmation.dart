@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:thanks/Screens/Home.dart';
 import 'package:thanks/Screens/RateOrder.dart';
+import 'package:thanks/services/helperFunctions.dart';
 class OrderConfirmation  extends StatefulWidget {
+  var id;
+
+  OrderConfirmation(this.id);
+
   @override
-  _OrderConfirmationState createState() => _OrderConfirmationState();
+  _OrderConfirmationState createState() => _OrderConfirmationState(id);
 }
 
 class _OrderConfirmationState extends State<OrderConfirmation > {
+  var id;
+
+  _OrderConfirmationState(this.id);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +45,16 @@ class _OrderConfirmationState extends State<OrderConfirmation > {
           ),
 
           InkWell(
-            onTap: ()=>Navigator.push(context, new MaterialPageRoute(builder: (context)=>  RateOrder())),
+            onTap: () async {
+              await getAdminInState();
+
+              Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_){
+              return Home(userIsAminIn);
+              }),(route)=> false
+              );
+            //  Navigator.push(context, new MaterialPageRoute(builder: (context)=>  RateOrder()))
+            },
 
             child: new Container(
             height: MediaQuery.of(context).size.width*0.15,
@@ -68,5 +87,13 @@ class _OrderConfirmationState extends State<OrderConfirmation > {
         ],
       ),
     );
+  }
+  bool userIsAminIn;
+  getAdminInState() async {
+    await HelperFunctions.getUserAdminSharedPreference().then((value){
+      setState(() {
+        userIsAminIn  = value;
+      });
+    });
   }
 }

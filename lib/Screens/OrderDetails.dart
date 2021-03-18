@@ -1,26 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:thanks/Screens/AdminPages/AddOrder.dart';
 import 'package:thanks/Screens/Cart.dart';
+import 'package:thanks/api/NetworkRequest.dart';
+import 'package:thanks/services/helperFunctions.dart';
 import 'package:thanks/widget/buttonFill.dart';
 
 class OrderDetails extends StatefulWidget {
+  var items;
+bool matjer;
+  OrderDetails(this.items,this.matjer);
+
   @override
-  _OrderDetailsState createState() => _OrderDetailsState();
+  _OrderDetailsState createState() => _OrderDetailsState(items,matjer);
 }
 
 class _OrderDetailsState extends State<OrderDetails> {
+  var items;
+  bool matjer;
+  String userName;
+  _OrderDetailsState(this.items,this.matjer);
+  getLoggedInState() async {
+    await HelperFunctions.getUserNameSharedPreference().then((value){
+      setState(() {
+        userName  = value;
+      });
+    });
+  }
+  @override
+  void initState() {
+    getLoggedInState();
+
+    // TODO: implement initState
+    super.initState();
+  }
+  NetworkRequest networkRequest=new NetworkRequest();
+  bool requestIsDone=false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
     appBar: AppBar(
       toolbarHeight: 80,
-    elevation: 2,
-    backgroundColor: Colors.white,
+      elevation: 1,
+      backgroundColor: Colors.white,
       title:  Text(
-        "وجبة عائلية رز مع لحم",
+        items['name']==null?items['p_p_meal']:items['name'],
         textAlign: TextAlign.center,
         style: TextStyle(
           fontFamily: "Tajawal",fontWeight: FontWeight.w500,
-          fontSize: 22,
+          fontSize: 20,
           color:Color(0xff17130c),
         ),
       ),
@@ -31,58 +59,87 @@ class _OrderDetailsState extends State<OrderDetails> {
           children: [
             BoxTop(),
             Container(
-              padding: EdgeInsets.symmetric(vertical: 16),
-              height: MediaQuery.of(context).size.height*0.3,
+              padding: EdgeInsets.symmetric(vertical: 16,horizontal:3),
+              height: MediaQuery.of(context).size.height*0.23,
               width: MediaQuery.of(context).size.width*0.99,
               decoration: BoxDecoration(
                 color:  Colors.white,
               ),
               child:  Column(
                 children: [
-                  rowText( "بيانات الطلب","#888A9C"),
+                  rowText( "بيانات الطلب","#${items['id']}"),
                   SizedBox(height: 5,),
-                  rowTextsection( "عدد الافراد","4 أفراد"),
-
-                  rowTextsection( " اسم المطعم", "معطعم المدينة"),
-                  rowTextsection( " الوجبة", "رز مع دجاج"),
+                  rowTextsection( "عدد الافراد",items['av_meals_count']),
+                  SizedBox(height: 3,),
+                  rowTextsection( " اسم المطعم", matjer?userName:items['admin']['full_name']),
+                  SizedBox(height: 3,),
+                  rowTextsection( " الوجبة", items['name']==null?"وجبة":items['name']),
 
                 ],
               ),
             ),
-            SizedBox(height: 8,),
+            SizedBox(height: 12,),
             Container(
-
-              margin: EdgeInsets.symmetric(horizontal:16),
+              margin: EdgeInsets.symmetric(horizontal:20),
               child: Align(
                 alignment: Alignment.centerRight,
                 child: new Text(
                   "إضافات مع الوجبة",
                   style: TextStyle(
                     fontFamily: "Tajawal",fontWeight: FontWeight.w500,
-                    fontSize: 20,
+                    fontSize: 18,
                     color:Color(0xff17130c),
                   ),
                 ),
               ),
             ),
-            SizedBox(height: 8,),
+            SizedBox(height: 12,),
             Container(
                padding: EdgeInsets.symmetric(vertical: 16),
-              height: MediaQuery.of(context).size.height*0.35,
+              height: MediaQuery.of(context).size.height*0.25,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
                 color:  Colors.white,
               ),
               child:  Column(
                 children: [
-                  rowTextsection( "حلويات","عدد 2"),
+                  SizedBox(height: 6,),//items['av_meals_count']
+                  rowTextsection( items['additions'] is int?"حلويات":items['additions'],""),
                   //SizedBox(height: 5,),
-                  rowTextsection( "مشروبات","عدد 2"),
-                  rowTextsection( "مقبلات", "عدد 2"),
-                  rowTextsection( " اخري", "عدد 2"),
-                  SizedBox(height: 16,),
+                  // rowTextsection( "مشروبات","عدد 2"),
+                  // rowTextsection( "مقبلات", "عدد 2"),
+                  // rowTextsection( " اخري", "عدد 2"),
+                  SizedBox(height: 28,),
                   InkWell(
-                    onTap: (){Navigator.push(context, new MaterialPageRoute(builder: (context)=>  Cart()));},
+                    onTap: () async {
+                  if(matjer){
+                    Navigator.push(context, new MaterialPageRoute(builder: (context)=>  AddOrder(id: items['id'])));
+                  }else{
+                      await getresultInState();
+
+                      if(result =="تم اضافة الى السلة نجاح"){
+                        setState(()=>requestIsDone=true);
+                        Fluttertoast.showToast(
+                            msg: result,
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Color(0xfff99b1d).withOpacity(0.9),
+                            textColor: Colors.white,
+                            fontSize: 16.0
+                        );
+                      }else   {
+                        Fluttertoast.showToast(
+                            msg: result,
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Color(0xfff99b1d).withOpacity(0.9),
+                            textColor: Colors.white,
+                            fontSize: 16.0
+                        );
+                      }
+                      Navigator.push(context, new MaterialPageRoute(builder: (context)=>  Cart()));}},
                     child: buttonFill(
                       widget: Center(
                         child: Row(
@@ -91,7 +148,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                             Image.asset("Assets/icon-add-cart.png"),
                             SizedBox(width: 6,),
                             new Text(
-                              "طلب الوجبة",
+                              matjer? "تعديل":  requestIsDone?"تم الطلب": "طلب الوجبة",
                               style: TextStyle(
                                 fontFamily: "Tajawal",fontWeight: FontWeight.w700,
                                 fontSize: 18,
@@ -104,21 +161,68 @@ class _OrderDetailsState extends State<OrderDetails> {
                       ),
                     ),
                   ),
-
+                 SizedBox(height: 16,),
                 ],
               ),
-            )
+            ),
+            matjer? InkWell(
+              onTap: (){
+                getcancelorderState();
+              //  networkRequest.cancelorder(items['id']);
+              },
+              child: Container(
+                margin: EdgeInsets.all(16),
+               height: 30,
+                child: new Text(
+                  "حذف الوجبة",
+                  style: TextStyle(
+                    fontFamily: "Tajawal",fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                    color:Color(0xffdd6a6a),
+                  ),
+                ),
+              ),
+            ):Container(),
           ],
         ),
       ) ,
     );
   }
+  getcancelorderState() async {
+    await   networkRequest.cancelorder(items['id']).then((value){
+      print(result);
+      setState(() {
+        result  = value; // (result =="لديك طلب من مطعم اخر لم يكتمل بعد" || result =="تم اضافة الوجبة مسبقاً")
+      });
+      Fluttertoast.showToast(
+          msg: value,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Color(0xfff99b1d).withOpacity(0.9),
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
+      Navigator.pop(context);
+    });
+  }
+  String result;
+  getresultInState() async {
+    await networkRequest.addcartitem(items["id"]).then((value){
+      print(result);
+      setState(() {
+        result  = value; // (result =="لديك طلب من مطعم اخر لم يكتمل بعد" || result =="تم اضافة الوجبة مسبقاً")
+
+      });
+
+    });
+  }
   Widget BoxTop(){
     return   Center(
       child: Container(
         margin: EdgeInsets.all(8),
-        height: MediaQuery.of(context).size.height*0.25,
-        width: MediaQuery.of(context).size.width* 0.85,
+        height: MediaQuery.of(context).size.height*0.22,
+        width: MediaQuery.of(context).size.width* 0.82,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8.00),
@@ -139,7 +243,7 @@ class _OrderDetailsState extends State<OrderDetails> {
     return      Row(
       children: [
         Container(
-          width: MediaQuery.of(context).size.width*0.3,
+          width: MediaQuery.of(context).size.width*0.349,
           child: Align(
             alignment: Alignment.centerRight,
             child: new Text(
@@ -152,8 +256,9 @@ class _OrderDetailsState extends State<OrderDetails> {
       ),
           ),
         ),
+
         Container(
-          width: MediaQuery.of(context).size.width*0.62,
+          width: MediaQuery.of(context).size.width*0.58,
           child: Align(
             alignment: Alignment.centerRight,
             child: Text(
@@ -175,7 +280,7 @@ class _OrderDetailsState extends State<OrderDetails> {
     return      Row(
       children: [
         Container(
-          width: MediaQuery.of(context).size.width*0.3,
+          width: MediaQuery.of(context).size.width*0.35,
           child: Align(
             alignment: Alignment.centerRight,
             child: new Text(
@@ -183,22 +288,22 @@ class _OrderDetailsState extends State<OrderDetails> {
               textAlign: TextAlign.right,
               style: TextStyle(
                 fontFamily: "Tajawal",fontWeight: FontWeight.w500,
-                fontSize: 16,
-                color:Color(0xff999bae),
+                fontSize: 15,
+                color:Color(0xff999bae).withOpacity(0.6),
               ),
             ),
           ),
         ),
         Container(
-          width: MediaQuery.of(context).size.width*0.62,
+          width: MediaQuery.of(context).size.width*0.58,
           child: Align(
             alignment: Alignment.centerRight,
             child: new Text(w,
     textAlign: TextAlign.right,
     style: TextStyle(
     fontFamily: "Tajawal",fontWeight: FontWeight.w500,
-    fontSize: 16,
-    color:Color(0xff17130c),
+    fontSize: 15,
+    color:Color(0xff17130c).withOpacity(0.6),
     ),
 
             ),
